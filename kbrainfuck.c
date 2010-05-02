@@ -2,7 +2,7 @@
 #include <linux/module.h>
 #include <linux/proc_fs.h>
 #include <linux/seq_file.h>
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 
 MODULE_DESCRIPTION("Brainfuck interpreter for linux kernel");
 MODULE_VERSION("0.1");
@@ -81,21 +81,21 @@ static int output_open(struct inode *inode, struct file *file)
 	return single_open(file, output_show, NULL);
 }
 
-static struct file_operations file_code_ops = {
+static const struct file_operations file_code_ops = {
 	.open    = code_open,
 	.read    = seq_read,
 	.write   = code_write,
 	.owner   = THIS_MODULE,
 };
 
-static struct file_operations file_input_ops = {
+static const struct file_operations file_input_ops = {
 	.open    = input_open,
 	.read    = seq_read,
 	.write   = input_write,
 	.owner   = THIS_MODULE,
 };
 
-static struct file_operations file_output_ops = {
+static const struct file_operations file_output_ops = {
 	.open    = output_open,
 	.read    = seq_read,
 	.owner   = THIS_MODULE,
@@ -105,43 +105,43 @@ static int __init kbrainfuck_init(void)
 {
 	dir_brainfuck = proc_mkdir("brainfuck", NULL);
 	if (dir_brainfuck == 0) {
-		printk("kbrainfuck: "
+		printk(KERN_WARNING "kbrainfuck: "
 			"Unable to create /proc/brainfuck directory\n");
 		return -ENOMEM;
 	} else {
-		printk("kbrainfuck: "
+		printk(KERN_INFO "kbrainfuck: "
 			"/proc/brainfuck directory created successfully\n");
 	}
 
 	file_code = create_proc_entry("code", 0666, dir_brainfuck);
 	if (file_code == 0) {
-		printk("kbrainfuck: "
+		printk(KERN_WARNING "kbrainfuck: "
 			"Unable to create /proc/brainfuck/code entry\n");
 		return -ENOMEM;
 	} else {
-		printk("kbrainfuck: "
+		printk(KERN_INFO "kbrainfuck: "
 			"/proc/brainfuck/code entry created successfully\n");
 	}
 	file_code->proc_fops = &file_code_ops;
 
 	file_input = create_proc_entry("input", 0666, dir_brainfuck);
 	if (file_input == 0) {
-		printk("kbrainfuck: "
+		printk(KERN_WARNING "kbrainfuck: "
 			"Unable to create /proc/brainfuck/input entry\n");
 		return -ENOMEM;
 	} else {
-		printk("kbrainfuck: "
+		printk(KERN_INFO "kbrainfuck: "
 			"/proc/brainfuck/input entry created successfully\n");
 	}
 	file_input->proc_fops = &file_input_ops;
 
 	file_output = create_proc_entry("output", NULL, dir_brainfuck);
 	if (file_output == 0) {
-		printk("kbrainfuck: "
+		printk(KERN_WARNING "kbrainfuck: "
 			"Unable to create /proc/brainfuck/output entry\n");
 		return -ENOMEM;
 	} else {
-		printk("kbrainfuck: "
+		printk(KERN_INFO "kbrainfuck: "
 			"/proc/brainfuck/output entry created successfully\n");
 	}
 	file_output->proc_fops = &file_output_ops;
