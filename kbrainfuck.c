@@ -22,13 +22,13 @@ static struct proc_dir_entry *dir_brainfuck, *file_code,
 
 static int code_show(struct seq_file *m, void *v)
 {
-        seq_printf(m, code);
-        return 0;
+	seq_printf(m, code);
+	return 0;
 }
 
 static int code_open(struct inode *inode, struct file *file)
 {
-        return single_open(file, code_show, NULL);
+	return single_open(file, code_show, NULL);
 }
 
 static ssize_t code_write(struct file *file,
@@ -47,13 +47,13 @@ static ssize_t code_write(struct file *file,
 
 static int input_show(struct seq_file *m, void *v)
 {
-        seq_printf(m, input);
-        return 0;
+	seq_printf(m, input);
+	return 0;
 }
 
 static int input_open(struct inode *inode, struct file *file)
 {
-        return single_open(file, input_show, NULL);
+	return single_open(file, input_show, NULL);
 }
 
 static ssize_t input_write(struct file *file,
@@ -72,13 +72,13 @@ static ssize_t input_write(struct file *file,
 
 static int output_show(struct seq_file *m, void *v)
 {
-        seq_printf(m, output);
-        return 0;
+	seq_printf(m, output);
+	return 0;
 }
 
 static int output_open(struct inode *inode, struct file *file)
 {
-        return single_open(file, output_show, NULL);
+	return single_open(file, output_show, NULL);
 }
 
 static struct file_operations file_code_ops = {
