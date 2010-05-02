@@ -103,7 +103,6 @@ static struct file_operations file_output_ops = {
 
 static int __init kbrainfuck_init(void)
 {
-	/* Create /proc/brainfuck directory */
 	dir_brainfuck = proc_mkdir("brainfuck", NULL);
 	if (dir_brainfuck == 0) {
 		printk("kbrainfuck: "
@@ -113,10 +112,7 @@ static int __init kbrainfuck_init(void)
 		printk("kbrainfuck: "
 			"/proc/brainfuck directory created successfully\n");
 	}
-	/* dir_brainfuck->proc_fops = &dir_brainfuck_ops; */
 
-
-	/* Create /proc/brainfuck/code entry */
 	file_code = create_proc_entry("code", 0666, dir_brainfuck);
 	if (file_code == 0) {
 		printk("kbrainfuck: "
@@ -128,7 +124,6 @@ static int __init kbrainfuck_init(void)
 	}
 	file_code->proc_fops = &file_code_ops;
 
-	/* Create /proc/brainfuck/input entry */
 	file_input = create_proc_entry("input", 0666, dir_brainfuck);
 	if (file_input == 0) {
 		printk("kbrainfuck: "
@@ -140,7 +135,6 @@ static int __init kbrainfuck_init(void)
 	}
 	file_input->proc_fops = &file_input_ops;
 
-	/* Create /proc/brainfuck/output entry */
 	file_output = create_proc_entry("output", NULL, dir_brainfuck);
 	if (file_output == 0) {
 		printk("kbrainfuck: "
