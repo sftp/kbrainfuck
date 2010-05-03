@@ -5,7 +5,7 @@
 #include <linux/uaccess.h>
 
 MODULE_DESCRIPTION("Brainfuck interpreter for linux kernel");
-MODULE_VERSION("0.1");
+MODULE_VERSION("0.2");
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("sftp");
 
@@ -13,12 +13,109 @@ MODULE_AUTHOR("sftp");
 #define INPUT_LEN 1024
 #define OUTPUT_LEN 1024
 
-static char code[CODE_LEN];
-static char input[INPUT_LEN];
-static char output[OUTPUT_LEN];
+#define AREA_SIZE 1024
+#define STACK_SIZE 48
+
+unsigned int stack[STACK_SIZE];
+unsigned int stack_pos = 0;
+
+unsigned int code_pos = 0;
+unsigned int input_pos = 0;
+unsigned int output_pos = 0;
+unsigned int area_pos = 0;
+
+static unsigned char code[CODE_LEN];
+static unsigned char input[INPUT_LEN];
+static unsigned char output[OUTPUT_LEN];
+
+static unsigned char area[AREA_SIZE];
+
+static unsigned char recalc;
 
 static struct proc_dir_entry *dir_brainfuck, *file_code,
 	*file_input, *file_output;
+
+int find_brace (int *code_pos)
+{
+	int braces = 0;
+
+	for ((*code_pos)++; input[*code_pos]; (*code_pos)++) {
+		if (input[*code_pos] == ']' && braces == 0)
+			return 0;
+		else if (input[*code_pos] == '[')
+			braces++;
+		else if (input[*code_pos] == ']')
+			braces--;
+	}
+	return 1;
+}
+
+int push(int x)
+{
+	stack[stack_pos] = x;
+	return ++stack_pos;
+}
+
+int pop(void)
+{
+	return --stack_pos;
+}
+
+int read_head(void)
+{
+	return stack[stack_pos - 1];
+}
+
+int brf(void)
+{
+	while (code[code_pos]) {
+		switch (code[code_pos]) {
+		case '+':
+			area[area_pos]++;
+			break;
+		case '-':
+			area[area_pos]--;
+			break;
+		case '>':
+			if (area_pos < AREA_SIZE - 1)
+				area_pos++;
+			else
+				area_pos = 0;
+			break;
+		case '<':
+			if (area_pos > 0)
+				area_pos--;
+			else
+				area_pos = AREA_SIZE - 1;
+			break;
+		case '.':
+			output[output_pos] = area[area_pos];
+			output_pos++;
+			break;
+		case ',':
+			if (input[input_pos] != '\0') {
+				area[area_pos] = input[input_pos];
+				input_pos++;
+			}
+			break;
+		case '[':
+			if (area[area_pos])
+				push(code_pos);
+			else if (find_brace(&code_pos))
+				return 1;
+			break;
+		case ']':
+			if (area[area_pos])
+				code_pos = read_head();
+			else
+				pop();
+			break;
+		}
+		code_pos++;
+	}
+
+	return 0;
+}
 
 static int code_show(struct seq_file *m, void *v)
 {
@@ -42,6 +139,8 @@ static ssize_t code_write(struct file *file,
 
 	copy_from_user(code, buff, len);
 	code[len] = '\0';
+	code_pos = 0;
+	recalc = 1;
 	return len;
 }
 
@@ -66,12 +165,27 @@ static ssize_t input_write(struct file *file,
 		len = count;
 
 	copy_from_user(input, buff, len);
-	code[len] = '\0';
+	input[len] = '\0';
+	input_pos = 0;
+	recalc = 1;
 	return len;
 }
 
 static int output_show(struct seq_file *m, void *v)
 {
+	unsigned int i;
+	if (recalc) {
+		for (i = 0; i < OUTPUT_LEN; i++)
+			output[i] = '\0';
+		for (i = 0; i < AREA_SIZE; i++)
+			area[i] = '\0';
+		output_pos = 0;
+		input_pos = 0;
+		code_pos = 0;
+		area_pos = 0;
+		brf();
+		recalc = 0;
+	}
 	seq_printf(m, output);
 	return 0;
 }
