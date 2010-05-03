@@ -17,12 +17,12 @@ MODULE_AUTHOR("sftp");
 #define STACK_SIZE 48
 
 unsigned int stack[STACK_SIZE];
-unsigned int stack_pos = 0;
+unsigned int stack_pos;
 
-unsigned int code_pos = 0;
-unsigned int input_pos = 0;
-unsigned int output_pos = 0;
-unsigned int area_pos = 0;
+unsigned int code_pos;
+unsigned int input_pos;
+unsigned int output_pos;
+unsigned int area_pos;
 
 static unsigned char code[CODE_LEN];
 static unsigned char input[INPUT_LEN];
@@ -35,7 +35,7 @@ static unsigned char recalc;
 static struct proc_dir_entry *dir_brainfuck, *file_code,
 	*file_input, *file_output;
 
-int find_brace (int *code_pos)
+int find_brace(int *code_pos)
 {
 	int braces = 0;
 
@@ -129,7 +129,7 @@ static int code_open(struct inode *inode, struct file *file)
 }
 
 static ssize_t code_write(struct file *file,
-	const char *buff, size_t count, loff_t * off)
+	const char *buff, size_t count, loff_t *off)
 {
 	int len;
 	if (count > CODE_LEN)
@@ -156,7 +156,7 @@ static int input_open(struct inode *inode, struct file *file)
 }
 
 static ssize_t input_write(struct file *file,
-	const char *buff, size_t count, loff_t * off)
+	const char *buff, size_t count, loff_t *off)
 {
 	int len;
 	if (count > CODE_LEN)
@@ -179,8 +179,10 @@ static int output_show(struct seq_file *m, void *v)
 			output[i] = '\0';
 		for (i = 0; i < AREA_SIZE; i++)
 			area[i] = '\0';
+
 		output_pos = 0;
 		input_pos = 0;
+		stack_pos = 0;
 		code_pos = 0;
 		area_pos = 0;
 		brf();
