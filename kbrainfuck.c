@@ -43,12 +43,12 @@ int find_brace(int *code_pos)
 {
 	int braces = 0;
 
-	for ((*code_pos)++; input[*code_pos]; (*code_pos)++) {
-		if (input[*code_pos] == ']' && braces == 0)
+	for ((*code_pos)++; code[*code_pos]; (*code_pos)++) {
+		if (code[*code_pos] == ']' && braces == 0)
 			return 0;
-		else if (input[*code_pos] == '[')
+		else if (code[*code_pos] == '[')
 			braces++;
-		else if (input[*code_pos] == ']')
+		else if (code[*code_pos] == ']')
 			braces--;
 	}
 	return 1;
