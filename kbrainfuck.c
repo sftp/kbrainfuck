@@ -16,6 +16,8 @@ MODULE_AUTHOR("sftp");
 #define AREA_SIZE 1024
 #define STACK_SIZE 48
 
+#define MAX_OPS 2048
+
 unsigned int stack[STACK_SIZE];
 unsigned int stack_pos;
 
@@ -23,6 +25,8 @@ unsigned int code_pos;
 unsigned int input_pos;
 unsigned int output_pos;
 unsigned int area_pos;
+
+unsigned int ops;
 
 static unsigned char code[CODE_LEN];
 static unsigned char input[INPUT_LEN];
@@ -68,7 +72,7 @@ int read_head(void)
 
 int brf(void)
 {
-	while (code[code_pos]) {
+	while (code[code_pos] && ops) {
 		switch (code[code_pos]) {
 		case '+':
 			area[area_pos]++;
@@ -112,6 +116,7 @@ int brf(void)
 			break;
 		}
 		code_pos++;
+		ops--;
 	}
 
 	return 0;
@@ -185,6 +190,7 @@ static int output_show(struct seq_file *m, void *v)
 		stack_pos = 0;
 		code_pos = 0;
 		area_pos = 0;
+		ops = MAX_OPS;
 		brf();
 		recalc = 0;
 	}
