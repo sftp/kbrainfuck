@@ -230,9 +230,6 @@ static int __init kbrainfuck_init(void)
 		printk(KERN_WARNING "kbrainfuck: "
 			"Unable to create /proc/brainfuck directory\n");
 		return -ENOMEM;
-	} else {
-		printk(KERN_INFO "kbrainfuck: "
-			"/proc/brainfuck directory created successfully\n");
 	}
 
 	file_code = create_proc_entry("code", 0666, dir_brainfuck);
@@ -240,9 +237,6 @@ static int __init kbrainfuck_init(void)
 		printk(KERN_WARNING "kbrainfuck: "
 			"Unable to create /proc/brainfuck/code entry\n");
 		return -ENOMEM;
-	} else {
-		printk(KERN_INFO "kbrainfuck: "
-			"/proc/brainfuck/code entry created successfully\n");
 	}
 	file_code->proc_fops = &file_code_ops;
 
@@ -251,9 +245,6 @@ static int __init kbrainfuck_init(void)
 		printk(KERN_WARNING "kbrainfuck: "
 			"Unable to create /proc/brainfuck/input entry\n");
 		return -ENOMEM;
-	} else {
-		printk(KERN_INFO "kbrainfuck: "
-			"/proc/brainfuck/input entry created successfully\n");
 	}
 	file_input->proc_fops = &file_input_ops;
 
@@ -262,9 +253,6 @@ static int __init kbrainfuck_init(void)
 		printk(KERN_WARNING "kbrainfuck: "
 			"Unable to create /proc/brainfuck/output entry\n");
 		return -ENOMEM;
-	} else {
-		printk(KERN_INFO "kbrainfuck: "
-			"/proc/brainfuck/output entry created successfully\n");
 	}
 	file_output->proc_fops = &file_output_ops;
 
