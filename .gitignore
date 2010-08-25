@@ -7,6 +7,7 @@
 *.ko.cmd
 *.mod.c
 *.mod.o
+*.patch
 Module.*
 modules.order
 .tmp_versions*
