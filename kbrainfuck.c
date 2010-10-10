@@ -142,7 +142,8 @@ static ssize_t code_write(struct file *file,
 	else
 		len = count;
 
-	copy_from_user(code, buff, len);
+	if (copy_from_user(code, buff, len))
+		return -1;
 	code[len] = '\0';
 	code_pos = 0;
 	recalc = 1;
@@ -169,7 +170,8 @@ static ssize_t input_write(struct file *file,
 	else
 		len = count;
 
-	copy_from_user(input, buff, len);
+	if (copy_from_user(input, buff, len))
+		return -1;
 	input[len] = '\0';
 	input_pos = 0;
 	recalc = 1;
