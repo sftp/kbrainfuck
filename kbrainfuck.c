@@ -248,7 +248,7 @@ static int __init kbrainfuck_init(void)
 	}
 	file_input->proc_fops = &file_input_ops;
 
-	file_output = create_proc_entry("output", NULL, dir_brainfuck);
+	file_output = create_proc_entry("output", 0444, dir_brainfuck);
 	if (file_output == 0) {
 		printk(KERN_WARNING "kbrainfuck: "
 			"Unable to create /proc/brainfuck/output entry\n");
