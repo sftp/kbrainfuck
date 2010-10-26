@@ -5,7 +5,7 @@
 #include <linux/uaccess.h>
 
 MODULE_DESCRIPTION("Brainfuck interpreter for linux kernel");
-MODULE_VERSION("0.2");
+MODULE_VERSION("0.3");
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("sftp");
 
