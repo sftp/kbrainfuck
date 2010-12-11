@@ -234,29 +234,26 @@ static int __init kbrainfuck_init(void)
 		return -ENOMEM;
 	}
 
-	file_code = create_proc_entry("code", 0666, dir_brainfuck);
+	file_code = proc_create("code", 0666, dir_brainfuck, &file_code_ops);
 	if (file_code == 0) {
 		printk(KERN_WARNING "kbrainfuck: "
 			"Unable to create /proc/brainfuck/code entry\n");
 		return -ENOMEM;
 	}
-	file_code->proc_fops = &file_code_ops;
 
-	file_input = create_proc_entry("input", 0666, dir_brainfuck);
+	file_input = proc_create("input", 0666, dir_brainfuck, &file_input_ops);
 	if (file_input == 0) {
 		printk(KERN_WARNING "kbrainfuck: "
 			"Unable to create /proc/brainfuck/input entry\n");
 		return -ENOMEM;
 	}
-	file_input->proc_fops = &file_input_ops;
 
-	file_output = create_proc_entry("output", 0444, dir_brainfuck);
+	file_output = proc_create("output", 0444, dir_brainfuck, &file_output_ops);
 	if (file_output == 0) {
 		printk(KERN_WARNING "kbrainfuck: "
 			"Unable to create /proc/brainfuck/output entry\n");
 		return -ENOMEM;
 	}
-	file_output->proc_fops = &file_output_ops;
 
 	return 0;
 }
