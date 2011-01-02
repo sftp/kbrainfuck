@@ -13,3 +13,11 @@ kbrainfuck:
 clean:
 	rm -f $(RES)
 	rm -rf $(DIR)
+
+load:	kbrainfuck
+	insmod ./kbrainfuck.ko
+
+unload:
+	rmmod kbrainfuck
+
+reload: unload load
