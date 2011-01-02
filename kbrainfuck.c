@@ -16,7 +16,7 @@ MODULE_AUTHOR("sftp");
 #define AREA_SIZE 1024
 #define STACK_SIZE 48
 
-#define MAX_OPS 2048
+#define MAX_OPS 4096
 
 unsigned int stack[STACK_SIZE];
 unsigned int stack_pos;
