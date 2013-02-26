@@ -41,7 +41,7 @@ static struct proc_dir_entry *dir_brainfuck, *file_code,
 
 u8 find_brace(u32 *code_pos)
 {
-	int braces = 0;
+	s32 braces = 0;
 
 	for ((*code_pos)++; code[*code_pos]; (*code_pos)++) {
 		if (code[*code_pos] == ']' && braces == 0)
