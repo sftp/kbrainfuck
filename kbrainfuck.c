@@ -39,7 +39,7 @@ static u8 recalc;
 static struct proc_dir_entry *dir_brainfuck, *file_code,
 	*file_input, *file_output;
 
-int find_brace(u32 *code_pos)
+u8 find_brace(u32 *code_pos)
 {
 	int braces = 0;
 
