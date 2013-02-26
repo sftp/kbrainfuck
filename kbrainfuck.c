@@ -51,12 +51,14 @@ u8 find_brace(u32 *code_pos)
 		else if (code[*code_pos] == ']')
 			braces--;
 	}
+
 	return 1;
 }
 
 u32 push(u32 x)
 {
 	stack[stack_pos] = x;
+
 	return ++stack_pos;
 }
 
@@ -115,6 +117,7 @@ int brf(void)
 				pop();
 			break;
 		}
+
 		code_pos++;
 		ops--;
 	}
@@ -125,6 +128,7 @@ int brf(void)
 static int code_show(struct seq_file *m, void *v)
 {
 	seq_printf(m, code);
+
 	return 0;
 }
 
@@ -137,6 +141,7 @@ static ssize_t code_write(struct file *file,
 	const char *buff, size_t count, loff_t *off)
 {
 	ssize_t len;
+
 	if (count > CODE_LEN)
 		len = CODE_LEN;
 	else
@@ -144,15 +149,18 @@ static ssize_t code_write(struct file *file,
 
 	if (copy_from_user(code, buff, len))
 		return -1;
+
 	code[len] = '\0';
 	code_pos = 0;
 	recalc = 1;
+
 	return len;
 }
 
 static int input_show(struct seq_file *m, void *v)
 {
 	seq_printf(m, input);
+
 	return 0;
 }
 
@@ -165,6 +173,7 @@ static ssize_t input_write(struct file *file,
 	const char *buff, size_t count, loff_t *off)
 {
 	ssize_t len;
+
 	if (count > CODE_LEN)
 		len = CODE_LEN;
 	else
@@ -172,15 +181,18 @@ static ssize_t input_write(struct file *file,
 
 	if (copy_from_user(input, buff, len))
 		return -1;
+
 	input[len] = '\0';
 	input_pos = 0;
 	recalc = 1;
+
 	return len;
 }
 
 static int output_show(struct seq_file *m, void *v)
 {
 	u32 i;
+
 	if (recalc) {
 		for (i = 0; i < OUTPUT_LEN; i++)
 			output[i] = '\0';
@@ -196,7 +208,9 @@ static int output_show(struct seq_file *m, void *v)
 		brf();
 		recalc = 0;
 	}
+
 	seq_printf(m, output);
+
 	return 0;
 }
 
