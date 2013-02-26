@@ -18,15 +18,15 @@ MODULE_AUTHOR("sftp");
 
 #define MAX_OPS 4096
 
-unsigned int stack[STACK_SIZE];
-unsigned int stack_pos;
+u32 stack[STACK_SIZE];
+u32 stack_pos;
 
-unsigned int code_pos;
-unsigned int input_pos;
-unsigned int output_pos;
-unsigned int area_pos;
+u32 code_pos;
+u32 input_pos;
+u32 output_pos;
+u32 area_pos;
 
-unsigned int ops;
+u32 ops;
 
 static u8 code[CODE_LEN];
 static u8 input[INPUT_LEN];
@@ -39,7 +39,7 @@ static u8 recalc;
 static struct proc_dir_entry *dir_brainfuck, *file_code,
 	*file_input, *file_output;
 
-int find_brace(int *code_pos)
+int find_brace(u32 *code_pos)
 {
 	int braces = 0;
 
@@ -54,18 +54,18 @@ int find_brace(int *code_pos)
 	return 1;
 }
 
-int push(int x)
+u32 push(u32 x)
 {
 	stack[stack_pos] = x;
 	return ++stack_pos;
 }
 
-int pop(void)
+u32 pop(void)
 {
 	return --stack_pos;
 }
 
-int peek(void)
+u32 peek(void)
 {
 	return stack[stack_pos - 1];
 }
