@@ -28,13 +28,13 @@ unsigned int area_pos;
 
 unsigned int ops;
 
-static unsigned char code[CODE_LEN];
-static unsigned char input[INPUT_LEN];
-static unsigned char output[OUTPUT_LEN];
+static u8 code[CODE_LEN];
+static u8 input[INPUT_LEN];
+static u8 output[OUTPUT_LEN];
 
-static unsigned char area[AREA_SIZE];
+static u8 area[AREA_SIZE];
 
-static unsigned char recalc;
+static u8 recalc;
 
 static struct proc_dir_entry *dir_brainfuck, *file_code,
 	*file_input, *file_output;
