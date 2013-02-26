@@ -65,7 +65,7 @@ int pop(void)
 	return --stack_pos;
 }
 
-int read_head(void)
+int peek(void)
 {
 	return stack[stack_pos - 1];
 }
@@ -110,7 +110,7 @@ int brf(void)
 			break;
 		case ']':
 			if (area[area_pos])
-				code_pos = read_head();
+				code_pos = peek();
 			else
 				pop();
 			break;
