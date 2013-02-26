@@ -180,7 +180,7 @@ static ssize_t input_write(struct file *file,
 
 static int output_show(struct seq_file *m, void *v)
 {
-	unsigned int i;
+	u32 i;
 	if (recalc) {
 		for (i = 0; i < OUTPUT_LEN; i++)
 			output[i] = '\0';
