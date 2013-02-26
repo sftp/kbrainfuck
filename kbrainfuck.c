@@ -164,7 +164,7 @@ static int input_open(struct inode *inode, struct file *file)
 static ssize_t input_write(struct file *file,
 	const char *buff, size_t count, loff_t *off)
 {
-	int len;
+	ssize_t len;
 	if (count > CODE_LEN)
 		len = CODE_LEN;
 	else
