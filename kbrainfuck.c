@@ -222,28 +222,28 @@ static int output_open(struct inode *inode, struct file *file)
 	return single_open(file, output_show, NULL);
 }
 
-static const struct file_operations file_code_ops = {
-	.open    = code_open,
-	.read    = seq_read,
-	.write   = code_write,
-	.owner   = THIS_MODULE,
-};
-
-static const struct file_operations file_input_ops = {
-	.open    = input_open,
-	.read    = seq_read,
-	.write   = input_write,
-	.owner   = THIS_MODULE,
-};
-
-static const struct file_operations file_output_ops = {
-	.open    = output_open,
-	.read    = seq_read,
-	.owner   = THIS_MODULE,
-};
-
 static int __init kbrainfuck_init(void)
 {
+	static const struct file_operations file_code_ops = {
+		.open    = code_open,
+		.read    = seq_read,
+		.write   = code_write,
+		.owner   = THIS_MODULE,
+	};
+
+	static const struct file_operations file_input_ops = {
+		.open    = input_open,
+		.read    = seq_read,
+		.write   = input_write,
+		.owner   = THIS_MODULE,
+	};
+
+	static const struct file_operations file_output_ops = {
+		.open    = output_open,
+		.read    = seq_read,
+		.owner   = THIS_MODULE,
+	};
+
 	dir_brainfuck = proc_mkdir("brainfuck", NULL);
 	if (dir_brainfuck == 0) {
 		kbrf_warn("Unable to create /proc/brainfuck directory\n");
