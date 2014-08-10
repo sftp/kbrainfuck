@@ -9,6 +9,8 @@ MODULE_VERSION("0.3");
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("sftp");
 
+#define kbrf_warn(fmt, args...) printk(KERN_WARNING fmt, ##args)
+
 #define CODE_LEN 1024
 #define INPUT_LEN 1024
 #define OUTPUT_LEN 1024
@@ -244,29 +246,25 @@ static int __init kbrainfuck_init(void)
 {
 	dir_brainfuck = proc_mkdir("brainfuck", NULL);
 	if (dir_brainfuck == 0) {
-		printk(KERN_WARNING "kbrainfuck: "
-			"Unable to create /proc/brainfuck directory\n");
+		kbrf_warn("Unable to create /proc/brainfuck directory\n");
 		return -ENOMEM;
 	}
 
 	file_code = proc_create("code", 0666, dir_brainfuck, &file_code_ops);
 	if (file_code == 0) {
-		printk(KERN_WARNING "kbrainfuck: "
-			"Unable to create /proc/brainfuck/code entry\n");
+		kbrf_warn("Unable to create /proc/brainfuck/code entry\n");
 		return -ENOMEM;
 	}
 
 	file_input = proc_create("input", 0666, dir_brainfuck, &file_input_ops);
 	if (file_input == 0) {
-		printk(KERN_WARNING "kbrainfuck: "
-			"Unable to create /proc/brainfuck/input entry\n");
+		kbrf_warn("Unable to create /proc/brainfuck/input entry\n");
 		return -ENOMEM;
 	}
 
 	file_output = proc_create("output", 0444, dir_brainfuck, &file_output_ops);
 	if (file_output == 0) {
-		printk(KERN_WARNING "kbrainfuck: "
-			"Unable to create /proc/brainfuck/output entry\n");
+		kbrf_warn("Unable to create /proc/brainfuck/output entry\n");
 		return -ENOMEM;
 	}
 
