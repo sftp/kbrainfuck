@@ -18,37 +18,38 @@ MODULE_AUTHOR("sftp");
 
 #define MAX_OPS 4096
 
-u32 stack[STACK_SIZE];
-u32 stack_pos;
+struct kbrf_ctx {
+	u32 stack[STACK_SIZE];
+	u8 code[CODE_LEN];
+	u8 input[INPUT_LEN];
+	u8 output[OUTPUT_LEN];
+	u8 area[AREA_SIZE];
 
-u32 code_pos;
-u32 input_pos;
-u32 output_pos;
-u32 area_pos;
+	u32 stack_pos;
+	u32 code_pos;
+	u32 input_pos;
+	u32 output_pos;
+	u32 area_pos;
 
-u32 ops;
-
-static u8 code[CODE_LEN];
-static u8 input[INPUT_LEN];
-static u8 output[OUTPUT_LEN];
-
-static u8 area[AREA_SIZE];
-
-static u8 recalc;
+	u32 ops;
+	u8 need_recalc : 1;
+};
 
 static struct proc_dir_entry *dir_brainfuck, *file_code,
 	*file_input, *file_output;
 
-u8 find_brace(u32 *code_pos)
+static struct kbrf_ctx ctx;
+
+u8 find_brace(void)
 {
 	s32 braces = 0;
 
-	for ((*code_pos)++; code[*code_pos]; (*code_pos)++) {
-		if (code[*code_pos] == ']' && braces == 0)
+	for (ctx.code_pos++; ctx.code[ctx.code_pos]; ctx.code_pos++) {
+		if (ctx.code[ctx.code_pos] == ']' && braces == 0)
 			return 0;
-		else if (code[*code_pos] == '[')
+		else if (ctx.code[ctx.code_pos] == '[')
 			braces++;
-		else if (code[*code_pos] == ']')
+		else if (ctx.code[ctx.code_pos] == ']')
 			braces--;
 	}
 
@@ -57,69 +58,69 @@ u8 find_brace(u32 *code_pos)
 
 u32 push(u32 x)
 {
-	stack[stack_pos] = x;
+	ctx.stack[ctx.stack_pos] = x;
 
-	return ++stack_pos;
+	return ++ctx.stack_pos;
 }
 
 u32 pop(void)
 {
-	return --stack_pos;
+	return --ctx.stack_pos;
 }
 
 u32 peek(void)
 {
-	return stack[stack_pos - 1];
+	return ctx.stack[ctx.stack_pos - 1];
 }
 
 int brf(void)
 {
-	while (code[code_pos] && ops) {
-		switch (code[code_pos]) {
+	while (ctx.code[ctx.code_pos] && ctx.ops) {
+		switch (ctx.code[ctx.code_pos]) {
 		case '+':
-			area[area_pos]++;
+			ctx.area[ctx.area_pos]++;
 			break;
 		case '-':
-			area[area_pos]--;
+			ctx.area[ctx.area_pos]--;
 			break;
 		case '>':
-			if (area_pos < AREA_SIZE - 1)
-				area_pos++;
+			if (ctx.area_pos < AREA_SIZE - 1)
+				ctx.area_pos++;
 			else
-				area_pos = 0;
+				ctx.area_pos = 0;
 			break;
 		case '<':
-			if (area_pos > 0)
-				area_pos--;
+			if (ctx.area_pos > 0)
+				ctx.area_pos--;
 			else
-				area_pos = AREA_SIZE - 1;
+				ctx.area_pos = AREA_SIZE - 1;
 			break;
 		case '.':
-			output[output_pos] = area[area_pos];
-			output_pos++;
+			ctx.output[ctx.output_pos] = ctx.area[ctx.area_pos];
+			ctx.output_pos++;
 			break;
 		case ',':
-			if (input[input_pos] != '\0') {
-				area[area_pos] = input[input_pos];
-				input_pos++;
+			if (ctx.input[ctx.input_pos] != '\0') {
+				ctx.area[ctx.area_pos] = ctx.input[ctx.input_pos];
+				ctx.input_pos++;
 			}
 			break;
 		case '[':
-			if (area[area_pos])
-				push(code_pos);
-			else if (find_brace(&code_pos))
+			if (ctx.area[ctx.area_pos])
+				push(ctx.code_pos);
+			else if (find_brace())
 				return 1;
 			break;
 		case ']':
-			if (area[area_pos])
-				code_pos = peek();
+			if (ctx.area[ctx.area_pos])
+				ctx.code_pos = peek();
 			else
 				pop();
 			break;
 		}
 
-		code_pos++;
-		ops--;
+		ctx.code_pos++;
+		ctx.ops--;
 	}
 
 	return 0;
@@ -127,7 +128,7 @@ int brf(void)
 
 static int code_show(struct seq_file *m, void *v)
 {
-	seq_printf(m, code);
+	seq_printf(m, ctx.code);
 
 	return 0;
 }
@@ -147,19 +148,19 @@ static ssize_t code_write(struct file *file,
 	else
 		len = count;
 
-	if (copy_from_user(code, buff, len))
+	if (copy_from_user(ctx.code, buff, len))
 		return -1;
 
-	code[len] = '\0';
-	code_pos = 0;
-	recalc = 1;
+	ctx.code[len] = '\0';
+	ctx.code_pos = 0;
+	ctx.need_recalc = 1;
 
 	return len;
 }
 
 static int input_show(struct seq_file *m, void *v)
 {
-	seq_printf(m, input);
+	seq_printf(m, ctx.input);
 
 	return 0;
 }
@@ -179,12 +180,12 @@ static ssize_t input_write(struct file *file,
 	else
 		len = count;
 
-	if (copy_from_user(input, buff, len))
+	if (copy_from_user(ctx.input, buff, len))
 		return -1;
 
-	input[len] = '\0';
-	input_pos = 0;
-	recalc = 1;
+	ctx.input[len] = '\0';
+	ctx.input_pos = 0;
+	ctx.need_recalc = 1;
 
 	return len;
 }
@@ -193,23 +194,23 @@ static int output_show(struct seq_file *m, void *v)
 {
 	u32 i;
 
-	if (recalc) {
+	if (ctx.need_recalc) {
 		for (i = 0; i < OUTPUT_LEN; i++)
-			output[i] = '\0';
+			ctx.output[i] = '\0';
 		for (i = 0; i < AREA_SIZE; i++)
-			area[i] = '\0';
+			ctx.area[i] = '\0';
 
-		output_pos = 0;
-		input_pos = 0;
-		stack_pos = 0;
-		code_pos = 0;
-		area_pos = 0;
-		ops = MAX_OPS;
+		ctx.output_pos = 0;
+		ctx.input_pos = 0;
+		ctx.stack_pos = 0;
+		ctx.code_pos = 0;
+		ctx.area_pos = 0;
+		ctx.ops = MAX_OPS;
 		brf();
-		recalc = 0;
+		ctx.need_recalc = 0;
 	}
 
-	seq_printf(m, output);
+	seq_printf(m, ctx.output);
 
 	return 0;
 }
