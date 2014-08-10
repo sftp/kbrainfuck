@@ -12,12 +12,12 @@ Brainfuck interpreter for linux kernel
 3. Usage examples
 
    $ echo ">++++++[<++++++++>-]>++[<+++++>-]<[<.+>-]" > /proc/brainfuck/code
-   $ cat /proc/brainfuck/output 
+   $ cat /proc/brainfuck/output
    0123456789
 
    $ echo ",[>,]<[.<]" > /proc/brainfuck/code
    $ echo -n "abcdef" > /proc/brainfuck/input
-   $ cat /proc/brainfuck/output 
+   $ cat /proc/brainfuck/output
    fedcba
 
 4. unloading module
