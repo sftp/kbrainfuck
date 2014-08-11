@@ -196,11 +196,8 @@ static ssize_t input_write(struct file *file,
 
 static int output_show(struct seq_file *m, void *v)
 {
-	u32 i;
-
 	if (ctx.need_recalc) {
-		for (i = 0; i < AREA_SIZE; i++)
-			ctx.area[i] = '\0';
+		memset(ctx.area, 0, AREA_SIZE);
 
 		ctx.output_pos = 0;
 		ctx.input_pos = 0;
