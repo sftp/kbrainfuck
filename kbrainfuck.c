@@ -125,6 +125,8 @@ int brf(void)
 		ctx.ops--;
 	}
 
+	ctx.output[ctx.output_pos] = 0;
+
 	return 0;
 }
 
@@ -197,8 +199,6 @@ static int output_show(struct seq_file *m, void *v)
 	u32 i;
 
 	if (ctx.need_recalc) {
-		for (i = 0; i < OUTPUT_LEN; i++)
-			ctx.output[i] = '\0';
 		for (i = 0; i < AREA_SIZE; i++)
 			ctx.area[i] = '\0';
 
